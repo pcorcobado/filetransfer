@@ -62,6 +62,7 @@ jobs:
   Deploy_PRE:
       needs: [Deploy_CERT]
       runs-on: ubuntu-latest
+      environment: PRE
       steps:
         - name: Ejecutando comando
           run: |
@@ -69,6 +70,7 @@ jobs:
   Deploy_PRO:
       needs: [Deploy_PRE]
       runs-on: ubuntu-latest
+      environment: PRO
       steps:
         - name: Ejecutando comando
           run: |
