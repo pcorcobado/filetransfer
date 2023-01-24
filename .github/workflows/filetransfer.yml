@@ -2,7 +2,7 @@ name: filetransfer ci/cd
 
 on: 
   push:
-    branches: [develop]
+    branches: [kk]
 
 jobs:
   build:
