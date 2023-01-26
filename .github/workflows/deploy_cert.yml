@@ -56,18 +56,24 @@ jobs:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_REGION }}
-            role-to-assume: ${{ secrets.PACKAGE_REPOSITORY_ROLE }}
+            #role-to-assume: ${{ secrets.PACKAGE_REPOSITORY_ROLE }}
             codeartifact-domain: ${{ secrets.CODEARTIFACT_DOMAIN }}
-            codeartifact-domain-owner: 123456789012
+            #codeartifact-domain-owner: 123456789012
             codeartifact-repository: ${{ secrets.CODEARTIFACT_REPOSITORY }}
-        - name: Accidentally upload to the same artifact via multiple jobs
-          uses: actions/upload-artifact@v3
-          with:
-              name: my-artifact
-              path: ${{ github.workspace }}
+        - name: Build and publish
+          run: |
+            export TWINE_USERNAME=aws
+            export TWINE_PASSWORD=`aws codeartifact get-authorization-token --domain my-domain --domain-owner ${{ secrets.AWS_ACCOUNT_ID }} --query authorizationToken --output text`
+            export TWINE_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain my-domain --domain-owner ${{ secrets.AWS_ACCOUNT_ID }} --repository my-private-repo --format pypi --query repositoryEndpoint --output text`
+            python setup.py sdist bdist_wheel
+            twine upload dist/*
+            aws codeartifact get-repository-endpoint --domain my_domain --repository my_repo --format maven
+            curl --request PUT https://my_domain-111122223333.d.codeartifact.us-west-2.amazonaws.com/maven/my_repo/com/mycompany/app/my-app/1.0/my-app-1.0.jar \
+     --user "aws:$CODEARTIFACT_AUTH_TOKEN" --header "Content-Type: application/octet-stream" \
+     --data-binary @my-app-1.0.jar
           
   Deploy_CERT:
-      needs: [Nexus]
+      needs: [CodeArtifact]
       runs-on: ubuntu-latest
       steps:
         - name: Ejecutando comando
