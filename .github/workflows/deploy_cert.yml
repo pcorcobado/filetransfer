@@ -42,13 +42,24 @@ jobs:
         - name: Ejecutando comando
           run: |
             echo -e "ESTOY EN CODE ANALYSIS\n"
-  Nexus:
+  CodeArtifact:
       needs: [Code_Analysis]
       runs-on: ubuntu-latest
       steps:
         - name: Ejecutando comando
           run: |
-            echo -e "ESTOY EN NEXUS\n"
+            echo -e "ESTOY EN CODEARTIFACT\n"
+        - name: Authenticate to CodeArtifact
+          uses: source-ag/codeartifact-login-action@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-west-2
+            role-to-assume: ${{ secrets.PACKAGE_REPOSITORY_ROLE }}
+            codeartifact-domain: pruebacicd
+            codeartifact-domain-owner: 123456789012
+            codeartifact-repository: snapshot
+          
   Deploy_CERT:
       needs: [Nexus]
       runs-on: ubuntu-latest
