@@ -45,6 +45,7 @@ jobs:
   CodeArtifact:
       needs: [Code_Analysis]
       runs-on: ubuntu-latest
+      environment: CERT
       steps:
         - name: Ejecutando comando
           run: |
@@ -54,11 +55,11 @@ jobs:
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-west-2
+            aws-region: ${{ secrets.AWS_REGION }}
             role-to-assume: ${{ secrets.PACKAGE_REPOSITORY_ROLE }}
-            codeartifact-domain: pruebacicd
+            codeartifact-domain: ${{ secrets.CODEARTIFACT_DOMAIN }}
             codeartifact-domain-owner: 123456789012
-            codeartifact-repository: snapshot
+            codeartifact-repository: ${{ secrets.CODEARTIFACT_REPOSITORY }}
           
   Deploy_CERT:
       needs: [Nexus]
