@@ -60,6 +60,11 @@ jobs:
             codeartifact-domain: ${{ secrets.CODEARTIFACT_DOMAIN }}
             codeartifact-domain-owner: 123456789012
             codeartifact-repository: ${{ secrets.CODEARTIFACT_REPOSITORY }}
+        - name: Accidentally upload to the same artifact via multiple jobs
+          uses: actions/upload-artifact@v3
+          with:
+              name: my-artifact
+              path: ${{ github.workspace }}
           
   Deploy_CERT:
       needs: [Nexus]
