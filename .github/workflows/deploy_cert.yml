@@ -21,13 +21,14 @@ jobs:
           distribution: 'adopt'
       - name: Build snapshoot
         run: |
-          pwd
-          ls -ltr
+          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/<version>//' | sed 's/<\/version>//'`
+          export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/<artifactId>//' | sed 's/<\/artifactId>//'`
+          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/<groupId>//' | sed 's/<\/groupId>//'`
           mvn -ntp -B clean verify -DskipITs=true
-          pwd
-          ls -ltr
-          type ansible
-          type ansible-playbook
+          ls -l target
+          echo ${VERION}
+          echo ${ARTIFACTID}
+          echo ${GROUPID}
   Unit_Testing:
       needs: [build]
       runs-on: ubuntu-latest
@@ -50,19 +51,23 @@ jobs:
         - name: Ejecutando comando
           run: |
             echo -e "ESTOY EN CODEARTIFACT\n"
+            ls -Rlt
+            echo ${VERION}
+            echo ${ARTIFACTID}
+            echo ${GROUPID}
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v1
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_REGION }}
-        - name: Publishing code
-          run: |
-            export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
-            export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
-            curl --request PUT ${AWS_REPOSITORY_URL}/pcm/app/my-app/1.0/pcm.zip \
-            --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
-            --data-binary @pcm.zip
+        #- name: Publishing code
+        #  run: |
+        #    export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
+        #    export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+        #    curl --request PUT ${AWS_REPOSITORY_URL}/pcm/app/my-app/1.0/pcm.zip \
+        #    --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
+        #    --data-binary @pcm.zip
           
   Deploy_CERT:
       needs: [CodeArtifact]
