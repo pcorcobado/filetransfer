@@ -41,7 +41,7 @@ jobs:
           ls -Rlt
           export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
           export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
-          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//'`
+          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
           export ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
 
           echo "------------------------------------------"
@@ -49,21 +49,22 @@ jobs:
           echo ${ARTIFACTID}
           echo ${GROUPID}
           echo ${ARTIFACT}
-          echo "------------------------------------------"
+          echo "------------------------------------------\n\n\n"
 
           export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
           export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           
           echo "------------------------------------------"
-          echo -e "\n\n${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
+          echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
           echo -e "pcm:${AWS_TOKEN}\n\n"
           echo -e "target/${ARTIFACT}\n\n"
           echo "------------------------------------------"
           
           
-          curl --request PUT "${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}" \
+          curl --request PUT ${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
           --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
           --data-binary "@target/${ARTIFACT}"
+
       - name: Deploy CERT
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
