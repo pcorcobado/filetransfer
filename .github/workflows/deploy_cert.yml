@@ -55,6 +55,7 @@ jobs:
         run: |
           export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
           export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+          echo 'curl --request PUT ${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" --data-binary @target/${ARTIFACT}'
           curl --request PUT ${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
           --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
           --data-binary @target/${ARTIFACT}
