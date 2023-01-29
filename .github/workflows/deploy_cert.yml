@@ -42,7 +42,7 @@ jobs:
           export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
           export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
           export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
-          export ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
+          export ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
 
           echo "------------------------------------------"
           echo ${VERSION}
