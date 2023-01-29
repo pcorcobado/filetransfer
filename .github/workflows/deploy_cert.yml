@@ -5,8 +5,9 @@ on:
     branches: [develop]
 
 jobs:
-  build:
+  deploy_cert:
     runs-on: ubuntu-latest
+    environment: CERT
     steps:
       - uses: actions/checkout@v3
 #      - uses: actions/checkout@v3
@@ -24,55 +25,39 @@ jobs:
           export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/<version>//' | sed 's/<\/version>//'`
           export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/<artifactId>//' | sed 's/<\/artifactId>//'`
           export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/<groupId>//' | sed 's/<\/groupId>//'`
+          export ARTIFACT="${ARTIFACTID}-${VERSIONç.zip"
           mvn -ntp -B clean verify -DskipITs=true
           ls -l target
-          echo ${VERION}
+          echo ${VERSION}
           echo ${ARTIFACTID}
           echo ${GROUPID}
-  Unit_Testing:
-      needs: [build]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Ejecutando comando
-          run: |
-            echo -e "ESTOY EN UNIT TESTING\n"
-  Code_Analysis:
-      needs: [Unit_Testing]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Ejecutando comando
-          run: |
-            echo -e "ESTOY EN CODE ANALYSIS\n"
-  CodeArtifact:
-      needs: [Code_Analysis]
-      runs-on: ubuntu-latest
-      environment: CERT
-      steps:
-        - name: Ejecutando comando
-          run: |
-            echo -e "ESTOY EN CODEARTIFACT\n"
-            ls -Rlt
-            echo ${VERION}
-            echo ${ARTIFACTID}
-            echo ${GROUPID}
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@v1
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_REGION }}
+          echo ${ARTIFACT}
+      - name: Unit Testing
+        run: |
+          echo -e "ESTOY EN UNIT TESTING\n"
+      - name: Code Analysis
+        run: |
+          echo -e "ESTOY EN CODE ANALYSIS\n"
+      - name: CodeArtifact
+        run: |
+          echo -e "ESTOY EN CODEARTIFACT\n"
+          ls -Rlt
+          echo ${VERSION}
+          echo ${ARTIFACTID}
+          echo ${GROUPID}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
         #- name: Publishing code
         #  run: |
         #    export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
         #    export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
-        #    curl --request PUT ${AWS_REPOSITORY_URL}/pcm/app/my-app/1.0/pcm.zip \
+        #    curl --request PUT ${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
         #    --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
-        #    --data-binary @pcm.zip
-          
-  Deploy_CERT:
-      needs: [CodeArtifact]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Ejecutando comando
-          run: |
-            echo -e "ESTOY EN DEPLOY CERT\n"
+        #    --data-binary @${ARTIFACT}
+      - name: Deploy CERT
+        run: |
+          echo -e "ESTOY EN DEPLOY CERT\n"
