@@ -38,13 +38,6 @@ jobs:
       - name: Code Analysis
         run: |
           echo -e "ESTOY EN CODE ANALYSIS\n"
-      - name: CodeArtifact
-        run: |
-          echo -e "ESTOY EN CODEARTIFACT\n"
-          ls -Rlt
-          echo ${VERSION}
-          echo ${ARTIFACTID}
-          echo ${GROUPID}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -53,6 +46,12 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Publishing code
         run: |
+          echo -e "ESTOY EN CODEARTIFACT\n"
+          ls -Rlt
+          echo ${VERSION}
+          echo ${ARTIFACTID}
+          echo ${GROUPID}
+
           export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
           export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           echo -e "\n\n\n\t${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
