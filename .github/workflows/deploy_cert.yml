@@ -51,13 +51,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-        #- name: Publishing code
-        #  run: |
-        #    export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
-        #    export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
-        #    curl --request PUT ${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
-        #    --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
-        #    --data-binary @${ARTIFACT}
+      - name: Publishing code
+        run: |
+          export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
+          export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+          curl --request PUT ${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
+          --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
+          --data-binary @target/${ARTIFACT}
       - name: Deploy CERT
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
