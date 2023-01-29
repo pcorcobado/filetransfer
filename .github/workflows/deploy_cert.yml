@@ -22,16 +22,7 @@ jobs:
           distribution: 'adopt'
       - name: Build snapshoot
         run: |
-          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
-          export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
-          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//'`
-          export ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
           mvn -ntp -B clean verify -DskipITs=true
-          ls -l target
-          echo ${VERSION}
-          echo ${ARTIFACTID}
-          echo ${GROUPID}
-          echo ${ARTIFACT}
       - name: Unit Testing
         run: |
           echo -e "ESTOY EN UNIT TESTING\n"
@@ -48,15 +39,27 @@ jobs:
         run: |
           echo -e "ESTOY EN CODEARTIFACT\n"
           ls -Rlt
+          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
+          export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
+          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//'`
+          export ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
+
+          echo "------------------------------------------"
           echo ${VERSION}
           echo ${ARTIFACTID}
           echo ${GROUPID}
+          echo ${ARTIFACT}
+          echo "------------------------------------------"
 
           export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
           export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
-          echo -e "\n\n\n\t${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
-          echo -e "\n\n\n\tpcm:${AWS_TOKEN}\n\n"
-          echo -e "\n\n\n\ttarget/${ARTIFACT}\n\n"
+          
+          echo "------------------------------------------"
+          echo -e "\n\n${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
+          echo -e "pcm:${AWS_TOKEN}\n\n"
+          echo -e "target/${ARTIFACT}\n\n"
+          echo "------------------------------------------"
+          
           
           curl --request PUT "${AWS_REPOSITORY_URL}/${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}" \
           --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
