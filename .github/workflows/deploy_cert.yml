@@ -22,9 +22,9 @@ jobs:
           distribution: 'adopt'
       - name: Build snapshoot
         run: |
-          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/<version>//' | sed 's/<\/version>//'`
-          export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/<artifactId>//' | sed 's/<\/artifactId>//'`
-          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/<groupId>//' | sed 's/<\/groupId>//'`
+          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
+          export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
+          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//'`
           export ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
           mvn -ntp -B clean verify -DskipITs=true
           ls -l target
