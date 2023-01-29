@@ -50,27 +50,19 @@ jobs:
         - name: Ejecutando comando
           run: |
             echo -e "ESTOY EN CODEARTIFACT\n"
-        - name: Authenticate to CodeArtifact
-          uses: source-ag/codeartifact-login-action@v2
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v1
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_REGION }}
-            #role-to-assume: ${{ secrets.PACKAGE_REPOSITORY_ROLE }}
-            codeartifact-domain: ${{ secrets.CODEARTIFACT_DOMAIN }}
-            #codeartifact-domain-owner: 123456789012
-            codeartifact-repository: ${{ secrets.CODEARTIFACT_REPOSITORY }}
-        - name: Build and publish
+        - name: Publishing code
           run: |
-            export AWS_USERNAME=aws
             export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
-            export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --query repositoryEndpoint --output text`
-            echo -e "\n\n\t${AWS_TOKEN}\n\n"
-            echo "${AWS_REPOSITORY_URL}\n\n"
-            #aws codeartifact get-repository-endpoint --domain my_domain --repository my_repo --format maven
-            #curl --request PUT https://my_domain-111122223333.d.codeartifact.us-west-2.amazonaws.com/maven/my_repo/com/mycompany/app/my-app/1.0/my-app-1.0.jar \
-     #--user "aws:$CODEARTIFACT_AUTH_TOKEN" --header "Content-Type: application/octet-stream" \
-     #--data-binary @my-app-1.0.jar
+            export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+            curl --request PUT ${AWS_REPOSITORY_URL}/pcm/app/my-app/1.0/pcm.zip \
+            --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
+            --data-binary @pcm.zip
           
   Deploy_CERT:
       needs: [CodeArtifact]
