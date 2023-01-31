@@ -44,6 +44,7 @@ jobs:
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           cat pom.xml
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
+          git push origin develop
       - name: Unit Testing
         run: |
           echo -e "ESTOY EN UNIT TESTING\n"
