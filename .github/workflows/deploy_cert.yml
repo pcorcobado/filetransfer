@@ -26,7 +26,7 @@ jobs:
           export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
           export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
           export ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
-          export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}’`
+          export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}'`
           
           echo "------------------------------------------"
           echo ${VERSION}
