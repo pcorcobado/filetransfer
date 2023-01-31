@@ -27,10 +27,22 @@ jobs:
           export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
           export ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
           export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}’`
+          
+          echo "------------------------------------------"
+          echo ${VERSION}
+          echo ${ARTIFACTID}
+          echo ${GROUPID}
+          echo ${ARTIFACT}
+          echo ${NEW_VERSION}
+          echo "------------------------------------------\n\n\n"
+
+
+
           mvn -ntp -B clean verify -DskipITs=true
           git config --global user.email "pcorcobado@yahoo.es"
           git config --global user.name "pcorcobado"
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
+          cat pom.xml
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
       - name: Unit Testing
         run: |
