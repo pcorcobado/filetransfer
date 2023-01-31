@@ -15,6 +15,8 @@ jobs:
 #          repository: machacamoya/ansible-playbook
 #          token: ${{ secrets.MYPAT }}
 #          path: ansible
+#          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+#          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -71,8 +73,13 @@ jobs:
           git config --global user.name "pcorcobado"
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           cat pom.xml
+          git add -A
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
-          git push
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          #branch: ${{ github.ref }}
 
 
       - name: Deploy CERT
