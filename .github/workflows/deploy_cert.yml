@@ -77,6 +77,7 @@ jobs:
           cat pom.xml
           git add pom.xml
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
+          gh auth status
           git push
       #- name: Push changes
       #  uses: ad-m/github-push-action@master
