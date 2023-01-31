@@ -69,17 +69,18 @@ jobs:
           #--user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
           #--data-binary "@target/${ARTIFACT}"
           
-          git config --global user.email "pcorcobado@yahoo.es"
-          git config --global user.name "pcorcobado"
+          git config --global user.email "corcobadopedro@gmail.com"
+          git config --global user.name "corcobadopedro"
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           cat pom.xml
           git add -A
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: develop
+          git push
+      #- name: Push changes
+      #  uses: ad-m/github-push-action@master
+      #  with:
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    branch: develop
 
 
       - name: Deploy CERT
