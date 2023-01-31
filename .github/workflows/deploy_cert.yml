@@ -28,7 +28,8 @@ jobs:
           export ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
           export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}’`
           mvn -ntp -B clean verify -DskipITs=true
-          git checkout develop
+          git config --global user.email "pcorcobado@yahoo.es"
+          git config --global user.name "pcorcobado"
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
       - name: Unit Testing
