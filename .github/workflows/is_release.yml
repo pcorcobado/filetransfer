@@ -26,6 +26,8 @@ jobs:
 
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           
+          echo -e "\n\n------------- GIT ------------\n\n"
+          git status
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
           git add pom.xml
