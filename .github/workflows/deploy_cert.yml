@@ -78,7 +78,6 @@ jobs:
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
-          git add pom.xml
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git push
       - name: Deploy CERT
