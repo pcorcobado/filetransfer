@@ -25,6 +25,8 @@ jobs:
           export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
           export timestamp="111111111111"
 
+          git config --global user.email "corcobadopedro@gmail.com"
+          git config --global user.name "corcobadopedro"
           git ls-remote --tags origin v${VERSION}
           git ls-remote --heads origin release-*
           git checkout develop
