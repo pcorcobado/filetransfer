@@ -24,12 +24,12 @@ jobs:
           export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
           export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, 0}'`
 
-          mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
-          
           echo -e "\n\n------------- GIT ------------\n\n"
           git status
+          git checkout develop
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
+          mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           git add pom.xml
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git push
@@ -38,10 +38,9 @@ jobs:
       - name: Update release
         run: |
           export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
-          mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
           
-          git config --global user.email "corcobadopedro@gmail.com"
-          git config --global user.name "corcobadopedro"
+          git checkout main
+          mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
           git add pom.xml
           git commit --allow-empty -am "chore: updating for ${VERSION} main [skip ci] with non-snapshot versions"
           git push
