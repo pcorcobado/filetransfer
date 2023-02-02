@@ -21,29 +21,29 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
-          export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, 0}'`
+          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
+          export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
+          export timestamp="111111111111"
 
+          git ls-remote --tags origin v${VERSION}
+          git ls-remote --heads origin release-*
+          git checkout develop
+          git checkout -b release-${VERSION}-${timestamp} develop
+          mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
+          git commit --allow-empty -am "chore: updating branch release-${VERSION}-${timestamp} with non-snapshot versions"
+          git checkout develop
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
-          
-          git config --global user.email "corcobadopedro@gmail.com"
-          git config --global user.name "corcobadopedro"
-          git add pom.xml
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
-          git push
+          git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
           git remote set-branches origin "*"
           git fetch
           git checkout main
-          git merge --no-ff develop
-      - name: Update release
-        run: |
-          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
-          
-          mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
-
-          git add pom.xml
-          git commit --allow-empty -am "chore: updating for ${VERSION} main [skip ci] with non-snapshot versions"
-          git push
+          git merge --no-ff release-${VERSION}-${timestamp}
+          git branch -D release-${VERSION}-${timestamp}
+          mvn -B clean verify
+          git push origin main
+          git checkout develop
+          git push origin develop
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
