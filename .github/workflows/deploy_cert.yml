@@ -58,11 +58,11 @@ jobs:
         run: |
           echo -e "ESTOY EN CODEARTIFACT\n"
           ls -l target/
-          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
-          export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
-          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
-          export ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
-          export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}'`
+          VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
+          ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
+          GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
+          ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
+          NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}'`
           
           echo "------------------------------------------"
           echo ${VERSION}
