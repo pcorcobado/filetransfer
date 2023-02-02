@@ -90,7 +90,8 @@ jobs:
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           cat pom.xml
           git add pom.xml
-          git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
+          #git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
+          git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop"
           git push
       #- name: Push changes
       #  uses: ad-m/github-push-action@master
