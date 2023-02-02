@@ -61,8 +61,8 @@ jobs:
           echo ${NEW_VERSION}
           echo -e "------------------------------------------\n\n\n"
           
-          #export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
-          #export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+          #AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
+          #AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           
           echo "------------------------------------------"
           #echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
