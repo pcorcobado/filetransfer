@@ -21,9 +21,9 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
-          export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
-          export timestamp="111111111111"
+          VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
+          NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
+          timestamp="111111111111"
 
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
