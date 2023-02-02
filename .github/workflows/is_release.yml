@@ -2,7 +2,7 @@ name: filetransfer ci/cd
 
 on: 
   release:
-    types: [created]
+    types: [published]
     branches: [develop]
 
 jobs:
