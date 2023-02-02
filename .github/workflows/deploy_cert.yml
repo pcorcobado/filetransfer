@@ -10,8 +10,8 @@ jobs:
     environment: CERT
     steps:
       - uses: actions/checkout@v3
-        with:
-            token: ${{ secrets.GH_TOKEN }}
+#        with:
+#            token: ${{ secrets.GH_TOKEN }}
 #      - uses: actions/checkout@v3
 #        with:
 #          repository: machacamoya/ansible-playbook
