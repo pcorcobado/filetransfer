@@ -3,6 +3,7 @@ name: filetransfer ci/cd
 on: 
   release:
     types: [created]
+    branches: [develop]
 
 jobs:
   deploy_cert:
