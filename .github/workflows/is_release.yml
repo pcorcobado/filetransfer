@@ -40,7 +40,8 @@ jobs:
           git remote set-branches origin "*"
           git fetch
           git checkout main
-          git merge --no-ff release-${VERSION}-${timestamp} --allow-unrelated-histories
+          #git merge --no-ff release-${VERSION}-${timestamp} --allow-unrelated-histories
+          git merge --no-ff release-${VERSION}-${timestamp}
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
