@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
   	<groupId>pruebascicd.org</groupId>
         <artifactId>filetransfer</artifactId>
-        <version>4.0.4-SNAPSHOT</version>
+        <version>4.0.5-SNAPSHOT</version>
         <name>filetransfer</name>
  	<dependencies>
 	</dependencies>
