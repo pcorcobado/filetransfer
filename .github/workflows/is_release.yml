@@ -21,9 +21,9 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          export VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
-          export NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
-          export timestamp="111111111111"
+          VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
+          NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
+          timestamp=`date +"%s"`
 
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
@@ -54,11 +54,10 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Publishing RELEASE
         run: |
-          echo -e "ESTOY EN CODEARTIFACT\n"
-          export VERSION=`grep -m 1 "<version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1-1, $2, $3}'`
-          export ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
-          export GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
-          export ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
+          VERSION=`grep -m 1 "<version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1-1, $2, $3}'`
+          ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
+          GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
+          ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
                     
           echo "------------------------------------------"
           echo ${VERSION}
@@ -68,8 +67,8 @@ jobs:
           echo ${NEW_VERSION}
           echo -e "------------------------------------------\n\n\n"
           
-          #export AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
-          #export AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+          #AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
+          #AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           
           echo "------------------------------------------"
           #echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
