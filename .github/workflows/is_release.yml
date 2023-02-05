@@ -40,6 +40,9 @@ jobs:
           git push origin develop
           git status
           #git remote set-branches origin "*"
+          git remote set-branches origin main
+          git branch
+          git branch -r
           git checkout main
           git fetch
           git status
