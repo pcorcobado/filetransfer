@@ -21,9 +21,14 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
+          git remote set-branches origin "*"
+          echo -e "------------- LOCAL ------------"
           git branch
+          echo -e "--------------------------------\n\n"
+          echo -e "------------- REMOTO ------------"
           git branch -r
-          
+          echo -e "--------------------------------\n\n"
+
           #VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
           #NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
           #timestamp=`date +"%s"`
