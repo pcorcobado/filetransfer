@@ -39,10 +39,13 @@ jobs:
           git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
           git push origin develop
           git status
-          #git remote set-branches origin "*"
-          git remote set-branches origin main
+          git remote set-branches origin "*"
+          echo -e "------------- LOCAL ------------"
           git branch
+          echo -e "--------------------------------\n\n"
+          echo -e "------------- REMOTO ------------"
           git branch -r
+          echo -e "--------------------------------\n\n"
           git checkout main
           git fetch
           git status
