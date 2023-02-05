@@ -41,7 +41,7 @@ jobs:
           git fetch origin main --depth 1
           git branch -a
           git checkout -b main origin/main
-          git merge --no-ff release-${VERSION}-${timestamp}
+          git merge --no-ff release-${VERSION}-${timestamp} --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
