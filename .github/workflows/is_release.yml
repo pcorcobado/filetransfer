@@ -1,4 +1,4 @@
-name: filetransfer ci/cd
+name: new_release
 
 on: 
   release:
