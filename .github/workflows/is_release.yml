@@ -20,8 +20,6 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
-          NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
           timestamp=`date +"%s"`
 
           git config --global user.email "corcobadopedro@gmail.com"
@@ -29,6 +27,10 @@ jobs:
           git ls-remote --tags origin v${VERSION}
           git ls-remote --heads origin release-*
           git checkout develop
+
+          VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
+          NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
+
           git checkout -b release-${VERSION}-${timestamp} develop
           mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating branch release-${VERSION}-${timestamp} with non-snapshot versions"
