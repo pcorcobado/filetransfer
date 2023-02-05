@@ -21,7 +21,7 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          git fetch origin master --depth 1
+          git fetch origin main --depth 1
           echo -e "------------- LOCAL ------------"
           git branch
           echo -e "--------------------------------\n\n"
