@@ -13,8 +13,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
             token: ${{ secrets.GH_TOKEN }}
-            fetch-depth: '0'
-            #ref: 'develop'
+            ref: 'develop'
+      - uses: actions/checkout@v3
+        with:
+            token: ${{ secrets.GH_TOKEN }}
+            ref: 'main'
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -22,7 +25,7 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          git fetch origin main --depth 1
+          #git fetch origin main --depth 1
           echo -e "------------- LOCAL ------------"
           git branch
           echo -e "--------------------------------\n\n"
