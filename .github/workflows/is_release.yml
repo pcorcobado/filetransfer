@@ -14,10 +14,6 @@ jobs:
         with:
             token: ${{ secrets.GH_TOKEN }}
             ref: 'develop'
-      - uses: actions/checkout@v3
-        with:
-            token: ${{ secrets.GH_TOKEN }}
-            ref: 'main'
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -25,17 +21,9 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          #git fetch origin main --depth 1
-          echo -e "------------- LOCAL ------------"
-          git branch
-          echo -e "--------------------------------\n\n"
-          echo -e "------------- REMOTO ------------"
-          git branch -r
-          echo -e "--------------------------------\n\n"
-
-          #VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
-          #NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
-          #timestamp=`date +"%s"`
+          VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
+          NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
+          timestamp=`date +"%s"`
 
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
@@ -43,32 +31,20 @@ jobs:
           git ls-remote --heads origin release-*
           
           
-          #git checkout -b release-${VERSION}-${timestamp} develop
-          #mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
-          #git commit --allow-empty -am "chore: updating branch release-${VERSION}-${timestamp} with non-snapshot versions"
-          #git checkout develop
-          #mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
-          #git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
-          #git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
-          #git push origin develop
-          #git status
-          #git remote set-branches origin "*"
-          #echo -e "------------- LOCAL ------------"
-          #git branch
-          #echo -e "--------------------------------\n\n"
-          #echo -e "------------- REMOTO ------------"
-          #git branch -r
-          #echo -e "--------------------------------\n\n"
-          #git checkout main
-          #git fetch
-          #git status
-          #git checkout main
-          #git merge --no-ff release-${VERSION}-${timestamp}
-          #git branch -D release-${VERSION}-${timestamp}
-          #mvn -B clean verify
-          #git push origin main
-          #git checkout develop
-          #git push origin develop
+          git checkout -b release-${VERSION}-${timestamp} develop
+          mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
+          git commit --allow-empty -am "chore: updating branch release-${VERSION}-${timestamp} with non-snapshot versions"
+          git checkout develop
+          mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
+          git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
+          git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
+          git checkout -b main origin/main
+          git merge --no-ff release-${VERSION}-${timestamp}
+          git branch -D release-${VERSION}-${timestamp}
+          mvn -B clean verify
+          git push origin main
+          git checkout develop
+          git push origin develop
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
