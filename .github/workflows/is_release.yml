@@ -20,9 +20,11 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
+          git fetch origin main --depth 1
+          git checkout -b main origin/main
           git fetch origin develop --depth 1
-          git branch -a
           git checkout -b develop origin/develop
+          git branch -a
           
           VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
           NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
