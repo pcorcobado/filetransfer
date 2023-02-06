@@ -48,7 +48,7 @@ jobs:
           git checkout main
           git fetch
           #git merge --no-ff release-${VERSION}-${timestamp}
-          git merge --no-ff -s theirs release-${VERSION}-${timestamp} --allow-unrelated-histories
+          git merge --no-ff -s ours release-${VERSION}-${timestamp} --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
