@@ -21,7 +21,7 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          git fetch origin develop --depth 0
+          git fetch origin develop --depth 1
           git branch -a
           git checkout -b develop origin/develop
           
