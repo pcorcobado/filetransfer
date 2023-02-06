@@ -43,10 +43,11 @@ jobs:
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
           #git fetch origin main --depth 1
-          git branch -a
+          git branch -a -vv
           #git checkout -b main origin/main
           git checkout main
-          git merge --no-ff release-${VERSION}-${timestamp} --allow-unrelated-histories
+          git merge --no-ff release-${VERSION}-${timestamp}
+          #git merge --no-ff release-${VERSION}-${timestamp} --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
