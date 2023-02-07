@@ -43,12 +43,11 @@ jobs:
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
-          #git fetch origin main --depth 1
           git branch -a
-          #git checkout -b main origin/main
           git checkout release-${VERSION}-${timestamp}
           git status -vv
           git checkout develop
+          git push origin develop
           git status -vv
           git checkout main
           git fetch
@@ -58,8 +57,6 @@ jobs:
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
-          git checkout develop
-          git push origin develop
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
