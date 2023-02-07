@@ -52,10 +52,7 @@ jobs:
           git checkout main
           git fetch
           git status -vv
-          git merge --no-ff release-${VERSION}-${timestamp} --allow-unrelated-histories
-          git checkout --conflict=merge .
-          git checkout --theirs .
-          git commit -m "Fixed conflicts using THEIRS strategy"
+          git merge --no-ff release-${VERSION}-${timestamp} --strategy-option theirs --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
