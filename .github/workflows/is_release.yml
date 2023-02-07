@@ -46,8 +46,13 @@ jobs:
           #git fetch origin main --depth 1
           git branch -a
           #git checkout -b main origin/main
+          git checkout release-${VERSION}-${timestamp}
+          git status -vv
+          git checkout develop
+          git status -vv
           git checkout main
           git fetch
+          git status -vv
           #git merge --no-ff release-${VERSION}-${timestamp}
           git merge --no-ff release-${VERSION}-${timestamp} --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
