@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
             token: ${{ secrets.GH_TOKEN }}
+            ref: main
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -20,11 +21,8 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          git fetch origin main --depth 1
-          git checkout -b main origin/main
           git fetch origin develop --depth 1
           git checkout -b develop origin/develop
-          git branch -a
           
           VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
           NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
@@ -39,18 +37,14 @@ jobs:
           git checkout -b release-${VERSION}-${timestamp} develop
           mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating branch release-${VERSION}-${timestamp} with non-snapshot versions"
-          cat pom.xml
           git checkout develop
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
           git remote set-branches origin "*"
           git fetch
-          cat pom.xml
           git checkout main
-          cat pom.xml
           git merge release-${VERSION}-${timestamp} --no-ff --strategy-option theirs --allow-unrelated-histories
-          cat pom.xml
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
