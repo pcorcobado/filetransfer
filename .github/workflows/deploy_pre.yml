@@ -1,10 +1,10 @@
 name: Deploy PRE
 
 on: 
-  push:
-    branches: [main]
-    paths: [pom.xml]
-
+  workflow_run:
+    workflows: ["new_release"]
+    types:
+      - completed
 jobs:
   deploy_PRE:
     runs-on: ubuntu-latest
