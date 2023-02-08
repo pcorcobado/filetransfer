@@ -1,10 +1,10 @@
 name: Deploy PRO
 
 on: 
-  push:
-    branches: [main]
-    paths: [pom.xml]
-
+  workflow_run:
+    workflows: ["Deploy PRE"]
+    types:
+      - completed
 jobs:
   deploy_PRO:
     runs-on: ubuntu-latest
