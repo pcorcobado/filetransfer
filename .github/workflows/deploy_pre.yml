@@ -27,4 +27,4 @@ jobs:
           ref: 'main'
       - name: Deploy PRE
         run: |
-          echo -e "ESTOY EN DEPLOY CERT\n"
+          echo -e "ESTOY EN DEPLOY PRE\n"
