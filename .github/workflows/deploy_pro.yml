@@ -1,0 +1,30 @@
+name: Deploy PRO
+
+on: 
+  workflow_run:
+    workflows: ["Deploy PRE"]
+    types:
+      - completed
+jobs:
+  deploy_PRO:
+    runs-on: ubuntu-latest
+    environment: PRO
+    steps:
+      - uses: actions/checkout@v3
+        with:
+            token: ${{ secrets.GH_TOKEN }}
+      - uses: actions/checkout@v3
+        with:
+          repository: pcorcobado/ansible-playbook
+          token: ${{ secrets.GH_TOKEN }}
+          path: ansible
+          ref: 'main'
+      - uses: actions/checkout@v3
+        with:
+          repository: pcorcobado/filetransfer-inventory
+          token: ${{ secrets.GH_TOKEN }}
+          path: inventory
+          ref: 'main'
+      - name: Deploy PRO
+        run: |
+          echo -e "ESTOY EN DEPLOY PRO\n"

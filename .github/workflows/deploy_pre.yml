@@ -1,0 +1,30 @@
+name: Deploy PRE
+
+on: 
+  workflow_run:
+    workflows: ["new_release"]
+    types:
+      - completed
+jobs:
+  deploy_PRE:
+    runs-on: ubuntu-latest
+    environment: PRE
+    steps:
+      - uses: actions/checkout@v3
+        with:
+            token: ${{ secrets.GH_TOKEN }}
+      - uses: actions/checkout@v3
+        with:
+          repository: pcorcobado/ansible-playbook
+          token: ${{ secrets.GH_TOKEN }}
+          path: ansible
+          ref: 'main'
+      - uses: actions/checkout@v3
+        with:
+          repository: pcorcobado/filetransfer-inventory
+          token: ${{ secrets.GH_TOKEN }}
+          path: inventory
+          ref: 'main'
+      - name: Deploy PRE
+        run: |
+          echo -e "ESTOY EN DEPLOY PRE\n"
