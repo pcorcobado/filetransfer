@@ -25,6 +25,6 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: inventory
           ref: 'main'
-      - name: Deploy CERT
+      - name: Deploy PRE
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
