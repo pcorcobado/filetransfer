@@ -44,10 +44,16 @@ jobs:
           git remote set-branches origin "*"
           git fetch
           git checkout main
+          echo -e "########################################## START ################################################\n\n\n"
+          echo -e "git log --graph --oneline --decorate --all\n"
           git log --graph --oneline --decorate --all
+          echo -e "DIFF\n"
           git diff
+          echo -e "DIFF --STANGED\n"
           git diff --staged
+          echo -e "DIF pom.xml\n"
           git diff pom.xml
+          echo -e "########################################### END #################################################\n\n\n"
           git merge release-${VERSION}-${timestamp} --no-ff --strategy-option theirs --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
