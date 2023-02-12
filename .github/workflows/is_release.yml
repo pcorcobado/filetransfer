@@ -44,6 +44,10 @@ jobs:
           git remote set-branches origin "*"
           git fetch
           git checkout main
+          git log --graph --oneline --decorate --all
+          git diff
+          git diff --staged
+          git diff pom.xml
           git merge release-${VERSION}-${timestamp} --no-ff --strategy-option theirs --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
