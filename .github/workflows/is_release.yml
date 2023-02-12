@@ -12,8 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+            fetch-depth: 0
             token: ${{ secrets.GH_TOKEN }}
-            ref: main
+            #ref: main
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -41,6 +42,7 @@ jobs:
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
+          git branch -a --contains main
           git remote set-branches origin "*"
           git fetch
           git checkout main
