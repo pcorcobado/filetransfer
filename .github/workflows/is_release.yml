@@ -54,6 +54,7 @@ jobs:
           echo -e "DIF pom.xml\n"
           git diff pom.xml
           echo -e "########################################### END #################################################\n\n\n"
+          git merge release-${VERSION}-${timestamp} --no-ff
           git merge release-${VERSION}-${timestamp} --no-ff --strategy-option theirs --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
