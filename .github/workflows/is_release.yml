@@ -14,7 +14,6 @@ jobs:
         with:
             fetch-depth: 0
             token: ${{ secrets.GH_TOKEN }}
-            #ref: main
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -22,8 +21,7 @@ jobs:
           distribution: 'adopt'
       - name: Update snapshoot
         run: |
-          #git fetch origin develop --depth 1
-          git checkout -b develop origin/develop
+          #git checkout -b develop origin/develop
           
           VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//' | awk -F "." '{printf "%s.%s.%s", $1, $2, 0}'`
           NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1+1, $2, $3}'`
@@ -42,22 +40,10 @@ jobs:
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
-          #git branch -a --contains main
           git remote set-branches origin "*"
           git fetch
           git checkout main
-          #echo -e "########################################## START ################################################\n\n\n"
-          #echo -e "git log --graph --oneline --decorate --all\n"
-          #git log --graph --oneline --decorate --all
-          #echo -e "DIFF\n"
-          #git diff
-          #echo -e "DIFF --STANGED\n"
-          #git diff --staged
-          #echo -e "DIF pom.xml\n"
-          #git diff pom.xml
-          #echo -e "########################################### END #################################################\n\n\n"
           git merge release-${VERSION}-${timestamp} --no-ff
-          #git merge release-${VERSION}-${timestamp} --no-ff --strategy-option theirs --allow-unrelated-histories
           git branch -D release-${VERSION}-${timestamp}
           mvn -B clean verify
           git push origin main
