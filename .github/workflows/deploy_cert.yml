@@ -83,3 +83,6 @@ jobs:
       - name: Deploy CERT
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
+          ls -lR
+          ansible-playbook -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
+
