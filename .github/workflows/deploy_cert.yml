@@ -39,6 +39,14 @@ jobs:
       - name: Code Analysis
         run: |
           echo -e "CODE ANALYSIS\n"
+      - name: Configure ssh keys
+        run: |
+          echo -e "Configure ssh keys\n"
+          mkdir -p ~/.ssh
+          cat ${{ secrets.PRIVATE_KEY }} > ~/.ssh/id_rsa
+          cat ${{ secrets.PUBLIC_KEY }} > ~/.ssh/id_rsa.pub
+          chmod 750 ~/.ssh
+          chmod 600 ~/.ssh/id_rsa
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -80,10 +88,29 @@ jobs:
           mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
           git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
           git push
+      - name: get runner ip address
+        id: ip
+        uses: haythem/public-ip@v1.3
+      - name: Print Public IP
+        run: |
+          echo ${{ steps.ip.outputs.ipv4 }}
+      #- name: whitelist runner ip address
+      #  run: |
+      #    aws ec2 authorize-security-group-ingress \
+      #      --group-name ${{ secrets.AWS_SG }} \
+      #      --protocol tcp \
+      #      --port 22 \
+      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      # aws ec2 create-network-acl-entry --network-acl-id acl-5fb85d36 --ingress --rule-number 100 --protocol udp --port-range From=53,To=53 --cidr-block 0.0.0.0/0 --rule-action allow
       - name: Deploy CERT
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
           ls -lR
           ansible-playbook -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
-
-
+      #- name: revoke runner ip address
+      #  run: |
+      #    aws ec2 revoke-security-group-ingress \
+      #      --group-name ${{ secrets.AWS_SG }} \
+      #      --protocol tcp \
+      #      --port 22 \
+      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
