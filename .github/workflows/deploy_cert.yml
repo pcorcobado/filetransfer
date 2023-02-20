@@ -39,11 +39,13 @@ jobs:
       - name: Code Analysis
         run: |
           echo -e "CODE ANALYSIS\n"
-      - name: Configure ssh keys
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.PRIVATE_KEY }} 
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+      - name: Configure known_hosts
         run: |
-          echo -e "Configure ssh keys\n"
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
           host='ec2-35-85-168-158.us-west-2.compute.amazonaws.com'
           hosts="$(dig +short "$host" | grep -v '\.$' | sed -z 's|\n|,|g')$host"
           ssh-keyscan -H "$hosts" > ~/.ssh/known_hosts
