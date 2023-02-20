@@ -46,7 +46,7 @@ jobs:
           known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
       - name: Configure known_hosts
         run: |
-          ssh-keyscan -H "35.85.168.158'" > ~/.ssh/known_hosts
+          ssh-keyscan -H "ec2-35-85-168-158.us-west-2.compute.amazonaws.com" > ~/.ssh/known_hosts
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
