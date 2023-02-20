@@ -106,7 +106,7 @@ jobs:
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
           ls -lR
-          ansible-playbook -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
+          ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
       - name: revoke runner ip address
         run: |
           aws ec2 revoke-security-group-ingress \
