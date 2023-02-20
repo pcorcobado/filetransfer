@@ -94,7 +94,7 @@ jobs:
       - name: whitelist runner ip address
         run: |
           aws ec2 authorize-security-group-ingress \
-            --group-name ${{ secrets.AWS_SG }} \
+            --group-id ${{ secrets.AWS_SG }} \
             --protocol tcp \
             --port 22 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
@@ -107,7 +107,7 @@ jobs:
       - name: revoke runner ip address
         run: |
           aws ec2 revoke-security-group-ingress \
-            --group-name ${{ secrets.AWS_SG }} \
+            --group-id ${{ secrets.AWS_SG }} \
             --protocol tcp \
             --port 22 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
