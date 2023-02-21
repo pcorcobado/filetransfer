@@ -37,7 +37,7 @@ jobs:
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
           
           aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
-          --format maven --namespace com.google.guava --package ${ARTIFACTID} --package-version ${VERSION} \
+          --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
           --asset ${ARTIFACT} \
           target/${ARTIFACT}
       - name: get runner ip address
@@ -46,13 +46,13 @@ jobs:
       - name: Print Public IP
         run: |
           echo ${{ steps.ip.outputs.ipv4 }}
-      #- name: whitelist runner ip address
-      #  run: |
-      #    aws ec2 authorize-security-group-ingress \
-      #      --group-id ${{ secrets.AWS_SG }} \
-      #      --protocol tcp \
-      #      --port 22 \
-      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      - name: whitelist runner ip address
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
       - name: Deploy PRE
         id: dpre
         run: |
@@ -63,12 +63,12 @@ jobs:
           echo ${{ steps.pcode.outputs.ARTIFACTID }}
           echo -e "------------------------------------------\n\n\n"
 
-      #    ansible-playbook --user ubuntu -i inventory/PRE/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.pcode.outputs.ARTIFACTID }}" -e "version=${{ steps.pcode.outputs.VERSION }}" -e "target=PRE" -e "workspace=target"
-      #- name: revoke runner ip address
-      #  if: success() || steps.dpre.conclusion == 'failure'
-      #  run: |
-      #    aws ec2 revoke-security-group-ingress \
-      #      --group-id ${{ secrets.AWS_SG }} \
-      #      --protocol tcp \
-      #      --port 22 \
-      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          ansible-playbook --user ubuntu -i inventory/PRE/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.pcode.outputs.ARTIFACTID }}" -e "version=${{ steps.pcode.outputs.VERSION }}" -e "target=PRE" -e "workspace=${PWD}"
+      - name: revoke runner ip address
+        if: success() || steps.dpre.conclusion == 'failure'
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
