@@ -27,6 +27,11 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: inventory
           ref: 'main'
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} 
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }} 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -43,9 +48,7 @@ jobs:
           
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
-          
-          echo -e "aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} --asset ${ARTIFACT} target/${ARTIFACT}"
-          
+        
           mkdir target
           aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
           --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
@@ -54,9 +57,6 @@ jobs:
       - name: get runner ip address
         id: ip
         uses: haythem/public-ip@v1.3
-      - name: Print Public IP
-        run: |
-          echo ${{ steps.ip.outputs.ipv4 }}
       - name: whitelist runner ip address
         run: |
           aws ec2 authorize-security-group-ingress \
@@ -67,12 +67,6 @@ jobs:
       - name: Deploy PRO
         id: dpre
         run: |
-          echo -e "ESTOY EN DEPLOY PRO\n"
-          ls -lR
-          echo "------------------------------------------"
-          echo ${{ steps.gartif.outputs.VERSION }}
-          echo ${{ steps.gartif.outputs.ARTIFACTID }}
-          echo -e "------------------------------------------\n\n\n"
           ansible-playbook --user ubuntu -i inventory/PRO/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.gartif.outputs.ARTIFACTID }}" -e "version=${{ steps.gartif.outputs.VERSION }}" -e "target=PRO" -e "workspace=${PWD}"
       - name: revoke runner ip address
         if: success() || steps.dpre.conclusion == 'failure'
