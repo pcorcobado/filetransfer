@@ -66,19 +66,19 @@ jobs:
           echo ${NEW_VERSION}
           echo -e "------------------------------------------\n\n\n"
           
-          AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
-          AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+          #AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
+          #AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           
-          echo "------------------------------------------"
-          echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
-          echo -e "pcm:${AWS_TOKEN}\n\n"
-          echo -e "target/${ARTIFACT}\n\n"
-          echo "------------------------------------------"
+          #echo "------------------------------------------"
+          #echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
+          #echo -e "pcm:${AWS_TOKEN}\n\n"
+          #echo -e "target/${ARTIFACT}\n\n"
+          #echo "------------------------------------------"
           
           
-          curl --request PUT ${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
-          --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
-          --data-binary "@target/${ARTIFACT}"
+          #curl --request PUT ${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
+          #--user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
+          #--data-binary "@target/${ARTIFACT}"
           
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
@@ -91,23 +91,31 @@ jobs:
       - name: Print Public IP
         run: |
           echo ${{ steps.ip.outputs.ipv4 }}
-      - name: whitelist runner ip address
-        run: |
-          aws ec2 authorize-security-group-ingress \
-            --group-id ${{ secrets.AWS_SG }} \
-            --protocol tcp \
-            --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      #- name: whitelist runner ip address
+      #  run: |
+      #    aws ec2 authorize-security-group-ingress \
+      #      --group-id ${{ secrets.AWS_SG }} \
+      #      --protocol tcp \
+      #      --port 22 \
+      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
       # aws ec2 create-network-acl-entry --network-acl-id acl-5fb85d36 --ingress --rule-number 100 --protocol udp --port-range From=53,To=53 --cidr-block 0.0.0.0/0 --rule-action allow
       - name: Deploy CERT
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
           ls -lR
-          ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
-      - name: revoke runner ip address
-        run: |
-          aws ec2 revoke-security-group-ingress \
-            --group-id ${{ secrets.AWS_SG }} \
-            --protocol tcp \
-            --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "------------------------------------------"
+          echo ${VERSION}
+          echo ${ARTIFACTID}
+          echo ${GROUPID}
+          echo ${ARTIFACT}
+          echo ${NEW_VERSION}
+          echo -e "------------------------------------------\n\n\n"
+
+      #    ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
+      #- name: revoke runner ip address
+      #  run: |
+      #    aws ec2 revoke-security-group-ingress \
+      #      --group-id ${{ secrets.AWS_SG }} \
+      #      --protocol tcp \
+      #      --port 22 \
+      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
