@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
             token: ${{ secrets.GH_TOKEN }}
+            ref: 'main'
       - uses: actions/checkout@v3
         with:
           repository: pcorcobado/ansible-playbook
@@ -26,15 +27,18 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: inventory
           ref: 'main'
-      - name: Donwload artifact
+      - name: Get artifact
+        id: gartif
         run: |
           VERSION=`grep -m 1 "</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
           ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
           GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
-          ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
+          ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
           
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
+          
+          echo -e "aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} --asset ${ARTIFACT} target/${ARTIFACT}"
           
           aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
           --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
@@ -59,10 +63,10 @@ jobs:
           echo -e "ESTOY EN DEPLOY PRO\n"
           ls -lR
           echo "------------------------------------------"
-          echo ${{ steps.pcode.outputs.VERSION }}
-          echo ${{ steps.pcode.outputs.ARTIFACTID }}
+          echo ${{ steps.gartif.outputs.VERSION }}
+          echo ${{ steps.gartif.outputs.ARTIFACTID }}
           echo -e "------------------------------------------\n\n\n"
-          ansible-playbook --user ubuntu -i inventory/PRO/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.pcode.outputs.ARTIFACTID }}" -e "version=${{ steps.pcode.outputs.VERSION }}" -e "target=PRO" -e "workspace=${PWD}"
+          ansible-playbook --user ubuntu -i inventory/PRO/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.gartif.outputs.ARTIFACTID }}" -e "version=${{ steps.gartif.outputs.VERSION }}" -e "target=PRO" -e "workspace=${PWD}"
       - name: revoke runner ip address
         if: success() || steps.dpre.conclusion == 'failure'
         run: |
