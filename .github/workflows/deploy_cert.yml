@@ -100,6 +100,7 @@ jobs:
       #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
       # aws ec2 create-network-acl-entry --network-acl-id acl-5fb85d36 --ingress --rule-number 100 --protocol udp --port-range From=53,To=53 --cidr-block 0.0.0.0/0 --rule-action allow
       - name: Deploy CERT
+        id: dcert
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
           ls -lR
@@ -112,7 +113,9 @@ jobs:
           echo -e "------------------------------------------\n\n\n"
 
       #    ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
+      # continue-on-error: true
       #- name: revoke runner ip address
+      #  if: success() || steps.dcert.conclusion == 'failure'
       #  run: |
       #    aws ec2 revoke-security-group-ingress \
       #      --group-id ${{ secrets.AWS_SG }} \
