@@ -40,6 +40,7 @@ jobs:
           echo -e "aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} --asset ${ARTIFACT} target/${ARTIFACT}"
           
           mkdir target
+          ls -ltR
           aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
           --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
           --asset ${ARTIFACT} \
