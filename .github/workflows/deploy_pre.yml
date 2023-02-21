@@ -49,14 +49,6 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
           
-          
-          echo -e "--------------------- CREAMOS TARGET ------------------"
-          mkdir target
-          ls -ltr
-          echo -e "-------------------------------------------------------"
-          
-          echo -e "aws codeartifact get-package-version-asset --domain egaction --repository release --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} --asset ${ARTIFACT} target/${ARTIFACT}"
-          
           aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
           --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
           --asset ${ARTIFACT} \
@@ -64,9 +56,6 @@ jobs:
       - name: get runner ip address
         id: ip
         uses: haythem/public-ip@v1.3
-      - name: Print Public IP
-        run: |
-          echo ${{ steps.ip.outputs.ipv4 }}
       - name: whitelist runner ip address
         run: |
           aws ec2 authorize-security-group-ingress \
@@ -77,13 +66,6 @@ jobs:
       - name: Deploy PRE
         id: dpre
         run: |
-          echo -e "ESTOY EN DEPLOY PRE\n"
-          ls -lR
-          echo "------------------------------------------"
-          echo ${{ steps.gartif.outputs.VERSION }}
-          echo ${{ steps.gartif.outputs.ARTIFACTID }}
-          echo -e "------------------------------------------\n\n\n"
-
           ansible-playbook --user ubuntu -i inventory/PRE/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.gartif.outputs.ARTIFACTID }}" -e "version=${{ steps.gartif.outputs.VERSION }}" -e "target=PRE" -e "workspace=${PWD}"
       - name: revoke runner ip address
         if: success() || steps.dpre.conclusion == 'failure'
