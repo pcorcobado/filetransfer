@@ -20,6 +20,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Update artifact version
+        id: uvers
         run: |
           git checkout -b develop origin/develop
           
@@ -70,23 +71,23 @@ jobs:
           ls -ltR
           
           echo "------------------------------------------"
-          echo ${{ steps.pcode.outputs.VERSION }}
-          echo ${{ steps.pcode.outputs.ARTIFACTID }}
-          echo ${{ steps.pcode.outputs.GROUPID }}
-          echo ${{ steps.pcode.outputs.ARTIFACT }}
+          echo ${{ steps.uvers.outputs.VERSION }}
+          echo ${{ steps.uvers.outputs.ARTIFACTID }}
+          echo ${{ steps.uvers.outputs.GROUPID }}
+          echo ${{ steps.uvers.outputs.ARTIFACT }}
           echo -e "------------------------------------------\n\n\n"
           
           AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
           AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           
           echo "------------------------------------------"
-          echo -e "\n\n${AWS_REPOSITORY_URL}${{ steps.pcode.outputs.GROUPID }}/${{ steps.pcode.outputs.ARTIFACTID }}/${{ steps.pcode.outputs.VERSION }}/${{ steps.pcode.outputs.ARTIFACT }}\n\n"
+          echo -e "\n\n${AWS_REPOSITORY_URL}${{ steps.uvers.outputs.GROUPID }}/${{ steps.uvers.outputs.ARTIFACTID }}/${{ steps.uvers.outputs.VERSION }}/${{ steps.uvers.outputs.ARTIFACT }}\n\n"
           echo -e "pcm:${AWS_TOKEN}\n\n"
-          echo -e "target/${{ steps.pcode.outputs.ARTIFACT }}\n\n"
+          echo -e "target/${{ steps.uvers.outputs.ARTIFACT }}\n\n"
           echo "------------------------------------------"
           
           
-          curl --request PUT ${AWS_REPOSITORY_URL}${{ steps.pcode.outputs.GROUPID }}/${{ steps.pcode.outputs.ARTIFACTID }}/${{ steps.pcode.outputs.VERSION }}/${{ steps.pcode.outputs.ARTIFACT }} \
+          curl --request PUT ${AWS_REPOSITORY_URL}${{ steps.uvers.outputs.GROUPID }}/${{ steps.uvers.outputs.ARTIFACTID }}/${{ steps.uvers.outputs.VERSION }}/${{ steps.uvers.outputs.ARTIFACT }} \
           --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
-          --data-binary "@target/${{ steps.pcode.outputs.ARTIFACT }}"
+          --data-binary "@target/${{ steps.uvers.outputs.ARTIFACT }}"
 
