@@ -32,7 +32,7 @@ jobs:
         run: |
           VERSION=`grep -m 1 "</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
           ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
-          GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
+          GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//'`
           ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
           
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
@@ -40,6 +40,7 @@ jobs:
           
           echo -e "aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} --asset ${ARTIFACT} target/${ARTIFACT}"
           
+          mkdir target
           aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
           --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
           --asset ${ARTIFACT} \
