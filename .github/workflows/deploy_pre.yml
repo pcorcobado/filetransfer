@@ -37,14 +37,17 @@ jobs:
           
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
-          echo -e "aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} --asset ${ARTIFACT} target/${ARTIFACT}"
+          
           
           echo -e "--------------------- CREAMOS TARGET ------------------"
           mkdir target
-          ls -ltR
-          pwd
+          ls -ltr
           echo -e "-------------------------------------------------------"
-          aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
+          
+          echo -e "aws codeartifact get-package-version-asset --domain egaction --repository release --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} --asset ${ARTIFACT} target/${ARTIFACT}"
+          
+          #aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
+          aws codeartifact get-package-version-asset --domain egaction --repository release \
           --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
           --asset ${ARTIFACT} \
           target/${ARTIFACT}
