@@ -59,8 +59,8 @@ jobs:
           ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
           NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}'`
           
-          echo "::set-env name=VERSION::$VERSION"
-          echo "::set-env name=ARTIFACTID::$ARTIFACTID"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
           
           echo "------------------------------------------"
           echo ${VERSION}
@@ -109,8 +109,8 @@ jobs:
           echo -e "ESTOY EN DEPLOY CERT\n"
           ls -lR
           echo "------------------------------------------"
-          echo ${VERSION}
-          echo ${ARTIFACTID}
+          echo ${{ steps.pcode.outputs.VERSION }}
+          echo ${{ steps.pcode.outputs.ARTIFACTID }}
           echo -e "------------------------------------------\n\n\n"
 
       #    ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
