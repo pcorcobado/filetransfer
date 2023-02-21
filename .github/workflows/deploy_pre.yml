@@ -27,6 +27,11 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: inventory
           ref: 'main'
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} 
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }} 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
