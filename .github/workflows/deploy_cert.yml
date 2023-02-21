@@ -39,14 +39,11 @@ jobs:
       - name: Code Analysis
         run: |
           echo -e "CODE ANALYSIS\n"
-      - name: Configure ssh keys
-        run: |
-          echo -e "Configure ssh keys\n"
-          mkdir -p ~/.ssh
-          cat ${{ secrets.PRIVATE_KEY }} > ~/.ssh/id_rsa
-          cat ${{ secrets.PUBLIC_KEY }} > ~/.ssh/id_rsa.pub
-          chmod 750 ~/.ssh
-          chmod 600 ~/.ssh/id_rsa
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} 
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }} 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -54,12 +51,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Publishing code
+        id: pcode
         run: |
           VERSION=`grep "\-SNAPSHOT</version>" pom.xml | sed 's/.*<version>//' | sed 's/-SNAPSHOT<\/version>//'`
           ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
           GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
           ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
           NEW_VERSION=`echo ${VERSION} | awk -F "." '{printf "%s.%s.%s", $1, $2, $3+1}'`
+          
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
           
           echo "------------------------------------------"
           echo ${VERSION}
@@ -69,19 +70,19 @@ jobs:
           echo ${NEW_VERSION}
           echo -e "------------------------------------------\n\n\n"
           
-          #AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
-          #AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
+          AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
+          AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           
           echo "------------------------------------------"
-          #echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
-          #echo -e "pcm:${AWS_TOKEN}\n\n"
-          #echo -e "target/${ARTIFACT}\n\n"
+          echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
+          echo -e "pcm:${AWS_TOKEN}\n\n"
+          echo -e "target/${ARTIFACT}\n\n"
           echo "------------------------------------------"
           
           
-          #curl --request PUT ${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
-          #--user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
-          #--data-binary "@target/${ARTIFACT}"
+          curl --request PUT ${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
+          --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
+          --data-binary "@target/${ARTIFACT}"
           
           git config --global user.email "corcobadopedro@gmail.com"
           git config --global user.name "corcobadopedro"
@@ -94,23 +95,31 @@ jobs:
       - name: Print Public IP
         run: |
           echo ${{ steps.ip.outputs.ipv4 }}
-      #- name: whitelist runner ip address
-      #  run: |
-      #    aws ec2 authorize-security-group-ingress \
-      #      --group-name ${{ secrets.AWS_SG }} \
-      #      --protocol tcp \
-      #      --port 22 \
-      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      - name: whitelist runner ip address
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
       # aws ec2 create-network-acl-entry --network-acl-id acl-5fb85d36 --ingress --rule-number 100 --protocol udp --port-range From=53,To=53 --cidr-block 0.0.0.0/0 --rule-action allow
       - name: Deploy CERT
+        id: dcert
         run: |
           echo -e "ESTOY EN DEPLOY CERT\n"
           ls -lR
-          ansible-playbook -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
-      #- name: revoke runner ip address
-      #  run: |
-      #    aws ec2 revoke-security-group-ingress \
-      #      --group-name ${{ secrets.AWS_SG }} \
-      #      --protocol tcp \
-      #      --port 22 \
-      #      --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          echo "------------------------------------------"
+          echo ${{ steps.pcode.outputs.VERSION }}
+          echo ${{ steps.pcode.outputs.ARTIFACTID }}
+          echo -e "------------------------------------------\n\n\n"
+
+          ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.pcode.outputs.ARTIFACTID }}" -e "version=${{ steps.pcode.outputs.VERSION }}-SNAPSHOT" -e "target=CERT" -e "workspace=${PWD}"
+      # continue-on-error: true
+      - name: revoke runner ip address
+        if: success() || steps.dcert.conclusion == 'failure'
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
