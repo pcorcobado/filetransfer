@@ -113,7 +113,7 @@ jobs:
           echo ${{ steps.pcode.outputs.ARTIFACTID }}
           echo -e "------------------------------------------\n\n\n"
 
-      #    ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${ARTIFACTID}" -e "version=${VERSION}" -e "target=CERT" -e "workspace=target"
+      #    ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.pcode.outputs.ARTIFACTID }}" -e "version=${{ steps.pcode.outputs.VERSION }}" -e "target=CERT" -e "workspace=target"
       # continue-on-error: true
       #- name: revoke runner ip address
       #  if: success() || steps.dcert.conclusion == 'failure'
