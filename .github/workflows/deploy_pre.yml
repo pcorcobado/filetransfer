@@ -48,7 +48,7 @@ jobs:
           
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
-          
+          mkdir target
           aws codeartifact get-package-version-asset --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} \
           --format maven --namespace ${GROUPID} --package ${ARTIFACTID} --package-version ${VERSION} \
           --asset ${ARTIFACT} \
