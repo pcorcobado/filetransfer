@@ -62,23 +62,8 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
           
-          echo "------------------------------------------"
-          echo ${VERSION}
-          echo ${ARTIFACTID}
-          echo ${GROUPID}
-          echo ${ARTIFACT}
-          echo ${NEW_VERSION}
-          echo -e "------------------------------------------\n\n\n"
-          
           AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
           AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
-          
-          echo "------------------------------------------"
-          echo -e "\n\n${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT}\n\n"
-          echo -e "pcm:${AWS_TOKEN}\n\n"
-          echo -e "target/${ARTIFACT}\n\n"
-          echo "------------------------------------------"
-          
           
           curl --request PUT ${AWS_REPOSITORY_URL}${GROUPID}/${ARTIFACTID}/${VERSION}/${ARTIFACT} \
           --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
@@ -92,9 +77,6 @@ jobs:
       - name: get runner ip address
         id: ip
         uses: haythem/public-ip@v1.3
-      - name: Print Public IP
-        run: |
-          echo ${{ steps.ip.outputs.ipv4 }}
       - name: whitelist runner ip address
         run: |
           aws ec2 authorize-security-group-ingress \
@@ -102,17 +84,9 @@ jobs:
             --protocol tcp \
             --port 22 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
-      # aws ec2 create-network-acl-entry --network-acl-id acl-5fb85d36 --ingress --rule-number 100 --protocol udp --port-range From=53,To=53 --cidr-block 0.0.0.0/0 --rule-action allow
       - name: Deploy CERT
         id: dcert
         run: |
-          echo -e "ESTOY EN DEPLOY CERT\n"
-          ls -lR
-          echo "------------------------------------------"
-          echo ${{ steps.pcode.outputs.VERSION }}
-          echo ${{ steps.pcode.outputs.ARTIFACTID }}
-          echo -e "------------------------------------------\n\n\n"
-
           ansible-playbook --user ubuntu -i inventory/CERT/host ansible/deploy_filetransfer.yml -e "artifactId=${{ steps.pcode.outputs.ARTIFACTID }}" -e "version=${{ steps.pcode.outputs.VERSION }}-SNAPSHOT" -e "target=CERT" -e "workspace=${PWD}"
       # continue-on-error: true
       - name: revoke runner ip address
