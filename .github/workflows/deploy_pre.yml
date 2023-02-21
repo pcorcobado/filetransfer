@@ -26,9 +26,6 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           path: inventory
           ref: 'main'
-      - name: get runner ip address
-        id: ip
-        uses: haythem/public-ip@v1.3
       - name: Donwload artifact
         run: |
           VERSION=`grep -m 1 "</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
@@ -43,6 +40,9 @@ jobs:
           --format maven --namespace com.google.guava --package ${ARTIFACTID} --package-version ${VERSION} \
           --asset ${ARTIFACT} \
           target/${ARTIFACT}
+      - name: get runner ip address
+        id: ip
+        uses: haythem/public-ip@v1.3
       - name: Print Public IP
         run: |
           echo ${{ steps.ip.outputs.ipv4 }}
