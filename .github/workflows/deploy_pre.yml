@@ -33,7 +33,7 @@ jobs:
           VERSION=`grep -m 1 "</version>" pom.xml | sed 's/.*<version>//' | sed 's/<\/version>//'`
           ARTIFACTID=`grep -m 1 "<artifactId>" pom.xml | sed 's/.*<artifactId>//' | sed 's/<\/artifactId>//'`
           GROUPID=`grep -m 1 "<groupId>" pom.xml | sed 's/.*<groupId>//' | sed 's/<\/groupId>//' | sed 's/\./\//g'`
-          ARTIFACT="${ARTIFACTID}-${VERSION}-SNAPSHOT.zip"
+          ARTIFACT="${ARTIFACTID}-${VERSION}.zip"
           
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "ARTIFACTID=$ARTIFACTID" >> $GITHUB_OUTPUT
