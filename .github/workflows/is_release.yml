@@ -37,28 +37,28 @@ jobs:
           echo "GROUPID=$GROUPID" >> $GITHUB_OUTPUT
           echo "ARTIFACT=$ARTIFACT" >> $GITHUB_OUTPUT
 
-      #    git config --global user.email "corcobadopedro@gmail.com"
-      #    git config --global user.name "corcobadopedro"
-      #    git ls-remote --tags origin v${VERSION}
-      #    git ls-remote --heads origin release-*
+          git config --global user.email "corcobadopedro@gmail.com"
+          git config --global user.name "corcobadopedro"
+          git ls-remote --tags origin v${VERSION}
+          git ls-remote --heads origin release-*
           
           
-      #    git checkout -b release-${VERSION}-${timestamp} develop
-      #    mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
-      #    git commit --allow-empty -am "chore: updating branch release-${VERSION}-${timestamp} with non-snapshot versions"
-      #    git checkout develop
-      #    mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
-      #    git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
-      #    git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
-      #    git remote set-branches origin "*"
-      #    git fetch
-      #    git checkout main
-      #    git merge release-${VERSION}-${timestamp} --no-ff
-      #    git branch -D release-${VERSION}-${timestamp}
-      #    mvn -B clean verify
-      #    git push origin main
-      #    git checkout develop
-      #    git push origin develop
+          git checkout -b release-${VERSION}-${timestamp} develop
+          mvn -ntp versions:set -DnewVersion=${VERSION} -DgenerateBackupPoms=false
+          git commit --allow-empty -am "chore: updating branch release-${VERSION}-${timestamp} with non-snapshot versions"
+          git checkout develop
+          mvn -ntp versions:set -DnewVersion=${NEW_VERSION}-SNAPSHOT -DgenerateBackupPoms=false
+          git commit --allow-empty -am "chore: updating for ${NEW_VERSION}-SNAPSHOT develop [skip ci]"
+          git merge --no-ff -m "Merge branch release-${VERSION}-${timestamp} into develop [skip ci]" -s ours release-${VERSION}-${timestamp}
+          git remote set-branches origin "*"
+          git fetch
+          git checkout main
+          git merge release-${VERSION}-${timestamp} --no-ff
+          git branch -D release-${VERSION}-${timestamp}
+          mvn -B clean verify
+          git push origin main
+          git checkout develop
+          git push origin develop
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -68,25 +68,9 @@ jobs:
       - name: Publishing code
         run: |
           
-          ls -ltR
-          
-          echo "------------------------------------------"
-          echo ${{ steps.uvers.outputs.VERSION }}
-          echo ${{ steps.uvers.outputs.ARTIFACTID }}
-          echo ${{ steps.uvers.outputs.GROUPID }}
-          echo ${{ steps.uvers.outputs.ARTIFACT }}
-          echo -e "------------------------------------------\n\n\n"
-          
           AWS_TOKEN=`aws codeartifact get-authorization-token --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --query authorizationToken --output text`
           AWS_REPOSITORY_URL=`aws codeartifact get-repository-endpoint --domain ${{ secrets.CODEARTIFACT_DOMAIN }} --repository ${{ secrets.CODEARTIFACT_REPOSITORY }} --format maven --output text` 
           
-          echo "------------------------------------------"
-          echo -e "\n\n${AWS_REPOSITORY_URL}${{ steps.uvers.outputs.GROUPID }}/${{ steps.uvers.outputs.ARTIFACTID }}/${{ steps.uvers.outputs.VERSION }}/${{ steps.uvers.outputs.ARTIFACT }}\n\n"
-          echo -e "pcm:${AWS_TOKEN}\n\n"
-          echo -e "target/${{ steps.uvers.outputs.ARTIFACT }}\n\n"
-          echo "------------------------------------------"
-          
-          
-      #    curl --request PUT ${AWS_REPOSITORY_URL}${{ steps.uvers.outputs.GROUPID }}/${{ steps.uvers.outputs.ARTIFACTID }}/${{ steps.uvers.outputs.VERSION }}/${{ steps.uvers.outputs.ARTIFACT }} \
-      #    --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
-      #    --data-binary "@target/${{ steps.uvers.outputs.ARTIFACT }}"
+          curl --request PUT ${AWS_REPOSITORY_URL}${{ steps.uvers.outputs.GROUPID }}/${{ steps.uvers.outputs.ARTIFACTID }}/${{ steps.uvers.outputs.VERSION }}/${{ steps.uvers.outputs.ARTIFACT }} \
+          --user "pcm:${AWS_TOKEN}" --header "Content-Type: application/octet-stream" \
+          --data-binary "@target/${{ steps.uvers.outputs.ARTIFACT }}"
